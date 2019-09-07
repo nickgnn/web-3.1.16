@@ -26,12 +26,11 @@ public class RegistrationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         String name = req.getParameter("name");
         String password = req.getParameter("password");
-        String money = req.getParameter("money");
-        Long aLong = Long.valueOf(money);
+        Long money = Long.valueOf(req.getParameter("money"));
         Map<String, Object> fields = new HashMap<>();
 
         try {
-            if (new BankClientService().addClient(new BankClient(name, password, aLong))) {
+            if (new BankClientService().addClient(new BankClient(name, password, money))) {
                 fields.put("message", "Add client successful");
                 resp.getWriter().println(PageGenerator.getInstance().getPage("resultPage.html", fields));
                 resp.setStatus(HttpServletResponse.SC_OK);

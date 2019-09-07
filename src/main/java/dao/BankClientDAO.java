@@ -62,19 +62,15 @@ public class BankClientDAO {
 
         ResultSet result = stmt.executeQuery();
         result.next();
+
         long resultMoney = (long) result.getInt("money") + transactValue;
+        int id = result.getInt("id");
 
-//        if (transactValue < 0) {
-//            if (isClientHasSum(name, transactValue)) {
-//                stmt.execute("update `bank_client` set money = " + resultMoney + " where `id` = " + result.getInt("id"));
-//            } else {
-//                System.out.println("not enough money");
-//            }
-//        } else {
-//            stmt.execute("update `bank_client` set money = " + resultMoney + " where `id` = " + result.getInt("id"));
-//        }
-
-        stmt.execute("update `bank_client` set money = " + resultMoney + " where `id` = " + result.getInt("id"));
+        stmt = connection.prepareStatement("update `bank_client` set money = ? where `id` = ?");
+        stmt.setLong(1, resultMoney);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
+//        stmt.executeUpdate("update `bank_client` set money = " + resultMoney + " where `id` = " + result.getInt("id"));
 
         result.close();
         stmt.close();
@@ -154,13 +150,7 @@ public class BankClientDAO {
 
     public void createTable() throws SQLException {
         Statement stmt = connection.createStatement();
-        stmt.execute("CREATE TABLE `db_example`.`bank_client` (\n" +
-                "  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,\n" +
-                "  `name` VARCHAR(265) NULL,\n" +
-                "  `password` VARCHAR(265) NULL,\n" +
-                "  `money` BIGINT(20) NULL,\n" +
-                "  PRIMARY KEY (`id`),\n" +
-                "  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE)");
+        stmt.execute("create table if not exists bank_client (id bigint auto_increment, name varchar(256), password varchar(256), money bigint, primary key (id))");
         stmt.close();
     }
 

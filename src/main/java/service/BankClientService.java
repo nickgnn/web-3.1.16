@@ -53,9 +53,16 @@ public class BankClientService {
 
     public boolean addClient(BankClient client) throws DBException {
         try {
-            getBankClientDAO().addClient(client);
+            BankClientDAO dao = getBankClientDAO();
 
-            return true;
+            if (dao.validateClient(client.getName(), client.getPassword())) {
+                return false;
+            } else if (getAllClient().contains(client)){
+                return false;
+            } else {
+                dao.addClient(client);
+                return true;
+            }
         } catch (SQLException e) {
             throw new DBException(e);
         }
@@ -67,8 +74,8 @@ public class BankClientService {
 
         try {
             if (bankClientDAO.isClientHasSum(sender.getName(), value)) {
-                bankClientDAO.updateClientsMoney(sender.getName(), sender.getPassword(), -value);
-                bankClientDAO.updateClientsMoney(name, recipient.getPassword(), value);
+                bankClientDAO.updateClientsMoney(sender.getName(), sender.getPassword(), -Math.abs(value));
+                bankClientDAO.updateClientsMoney(name, recipient.getPassword(), Math.abs(value));
             } else {
                 return false;
             }
